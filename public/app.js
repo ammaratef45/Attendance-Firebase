@@ -30,8 +30,8 @@ function getUiConfig() {
         loadClasses(JSON.parse(this.responseText).data.classes)
       }
     };
-    //const url = "https://attendance-app-api.herokuapp.com/getInfo";
-    const url = "http://127.0.0.1:3000/getInfo"; 
+    const url = "https://attendance-app-api.herokuapp.com/getInfo";
+    //const url = "http://127.0.0.1:3000/getInfo"; 
     xhttp.open("POST", url, true);
     xhttp.withCredentials = true;
     xhttp.setRequestHeader('x-token', token);
