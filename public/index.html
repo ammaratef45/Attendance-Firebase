@@ -31,29 +31,6 @@
             <p>
               <button id="sign-out">Sign Out</button>
             </p>
-            <input id="togList" type="checkbox">
-            <label for="togList">
-              <span>Expand</span>
-            </label>
-            <div class="list">
-              <ul>
-                <li>Item 1</li>
-                <li>Item 2</li>
-                <li>Item 3</li>
-              </ul>
-            </div>
-            <style>
-              [id^="togList"],                        /* HIDE CHECKBOX */
-              [id^="togList"] ~ .list{
-                display:none;
-              }
-              [id^="togList"]:checked + label span + span{
-                display:inline-block;                 /* SHOW "Collapse" (IF CHECKED) */
-              }
-              [id^="togList"]:checked ~ .list{
-                display:block;                        /* SHOW LIST (IF CHECKED) */
-              }
-            </style>
             <div id='user-sessions'>
             </div>
           </div>
