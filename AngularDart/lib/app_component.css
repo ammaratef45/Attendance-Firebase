@@ -1,0 +1,20 @@
+img {
+   widows: 120px;
+   height: 120px;
+   float: left;
+   padding: 8px;
+}
+
+#userCard {
+    border: 1px black solid;
+    padding: 8px;
+    height: 136px;
+}
+
+ul {
+    list-style: none;
+}
+
+li {
+    margin-bottom: 10px;
+}
