@@ -39,35 +39,43 @@ function getUiConfig() {
   }
 
   function loadClasses(classes) {
-     
     for(everyclass in classes) {
-      const name = classes[everyclass].name;
-      const id = name+"tog";
-      const list_id = id + "list";
-      let htmlText = "<input id=\""+id+"\" type=\"checkbox\"/>";
+      let name = classes[everyclass].name;
+      let id = name+"tog";
+      let list_id = id + "list";
+      let htmlText = "<input class=\"box\" id=\""+id+"\" type=\"checkbox\"/>";
       htmlText += "<label for=\""+id+"\" style=\"display:block;\">";
       htmlText += "<span style=\"display:inline-block;\">" + name + "</span>";
       htmlText += "</label>";
       htmlText += "<div id=\"" + list_id + "\">";
       htmlText += "<ul>";
       for(session in classes[everyclass].sessions) {
-        const val = classes[everyclass].sessions[session].qrval;
-        const json = JSON.parse(val);        
-        const date = json["date"];
+        let val = classes[everyclass].sessions[session].qrval;
+        let json = JSON.parse(val);        
+        let date = json["date"];
         htmlText += "<li>" + date + "</li>"
       }
       htmlText += "</ul>";
       htmlText += "</div>";
       document.getElementById('user-sessions').innerHTML += htmlText;
-      document.getElementById(id).style.display = "none";
+      let element = document.getElementById(id);
+      element.style.display = "none";
       document.getElementById(list_id).style.display = "none";
-      document.getElementById(id).addEventListener('change', function(){
-        if(document.getElementById(id).checked) {
-          document.getElementById(list_id).style.display = "block";
+    }
+    addEventListners();
+  }
+
+  function addEventListners() {
+    const elemens = document.getElementsByClassName('box');
+    for(let i=0; i<elemens.length; i++) {
+      elemens[i].addEventListener("change", function (event) {
+        let clickedBox = event.target;
+        if(clickedBox.checked) {
+          document.getElementById(clickedBox.id+"list").style.display = "block";
         } else {
-          document.getElementById(list_id).style.display = "none";
+          document.getElementById(clickedBox.id+"list").style.display = "none";
         }
-      });
+    });
     }
   }
   
