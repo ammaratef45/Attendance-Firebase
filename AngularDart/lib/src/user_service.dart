@@ -6,8 +6,8 @@ import 'package:attendance_dashboard/src/sessions.dart';
 import 'package:http/http.dart';
 
 class UserService {
-  //static const _infoUrl = 'https://attendance-app-api.herokuapp.com/getInfo';
-  static const _infoUrl = 'http://127.0.0.1:3000/getInfo';
+  static const _infoUrl = 'https://attendance-app-api.herokuapp.com/getInfo';
+  //static const _infoUrl = 'http://127.0.0.1:3000/getInfo';
   final Client _http;
 
   UserService(this._http);
