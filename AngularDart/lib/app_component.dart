@@ -1,94 +1,133 @@
 import 'dart:async';
+import 'dart:html';
+import 'dart:js';
 import 'package:angular/angular.dart';
 import 'package:angular_components/angular_components.dart';
 import 'package:angular_components/material_expansionpanel/material_expansionpanel.dart';
 import 'package:angular_components/material_expansionpanel/material_expansionpanel_set.dart';
 import 'package:attendance_dashboard/src/class.dart';
+import 'package:attendance_dashboard/src/sessions.dart';
 import 'package:attendance_dashboard/src/user_service.dart';
 import 'package:firebase_dart_ui/firebase_dart_ui.dart';
 import 'package:firebase/firebase.dart' as fb;
 
-
+//ignore: implementation_imports
 import 'package:firebase/src/interop/firebase_interop.dart';
 import 'package:js/js.dart';
 
-import 'dart:js';
+
 
 @Component(
   selector: 'my-app',
   templateUrl: 'app_component.html',
-  styleUrls: ['app_component.css'],
-  directives: const[
+  styleUrls: <String>['app_component.css'],
+  directives: <dynamic> [
     NgIf,
     FirebaseAuthUIComponent,
     coreDirectives,
     MaterialExpansionPanel,
     MaterialExpansionPanelSet,
+    MaterialProgressComponent
   ],
-  providers: const[
+  providers: <dynamic> [
     UserService,
     materialProviders
   ]
 )
+/// Main Component
 class AppComponent {
-  UIConfig _uiConfig;
-  final UserService _userService;
+  /// constructor
   AppComponent(this._userService) {
     getUserInfo();
   }
-
-  save() {
-
+  UIConfig _uiConfig;
+  final UserService _userService;
+  /// is page loading?
+  bool loading = false;
+  
+  /// download a sheet of a session
+  Future<void> downloadSessionSheet(Class aclass, Session session) async {
+    loading = true;
+    try {
+      final String token = await fb.auth().currentUser?.getIdToken();
+      final String file = await _userService.getSessionSheet(
+        token,
+        classKey: aclass.key,
+        sessionKey: session.key
+      );
+      final String encodedFileContents = Uri.encodeComponent(file);
+      AnchorElement(href: 'data:text/plain;charset=utf-8,$encodedFileContents')
+        ..setAttribute('download', 'file.csv')
+        ..click();
+      print(file);
+    } catch (e) {
+      print(e.toString());
+      window.alert(e.toString());
+    } finally {
+      loading = false;
+    }
   }
 
-  cancel() {
-
-  }
-
-  Future<Null> logout() async {
+  /// logout the user
+  Future<void> logout() async {
     await fb.auth().signOut();
   }
-  PromiseJsImpl<void>  signInFailure(AuthUIError authUiError) {
-    return new PromiseJsImpl<void>( () => print("SignIn Failure"));
-  }
 
+  /// sign in failed
+  PromiseJsImpl<void>  signInFailure(AuthUIError authUiError) =>
+    PromiseJsImpl<void>( () => print('SignIn Failure'));
+
+  /// sigin successed
   bool signInSuccess(fb.UserCredential authResult, String redirectUrl) {
-    print("sign in  success. ProviderID =  ${authResult.credential.providerId}");
-    print("Info= ${authResult.additionalUserInfo}");
+    print(
+      'sign in  success. ProviderID = '
+      '${authResult.credential.providerId}'
+    );
+    print('Info= ${authResult.additionalUserInfo}');
     getUserInfo();
     return false;
   }
 
-  void getUserInfo() async {
-    await Future.delayed(Duration(seconds: 3));
-    String token = await fb.auth().currentUser?.getIdToken();
-    print(token);
-    this.userInfo =  await _userService.getInfo(token);
-    print(this.userInfo);
+  /// get the user's info
+  Future<void> getUserInfo() async {
+    loading = true;
+    try {
+      await Future<void>.delayed(Duration(seconds: 3));
+      final String token = await fb.auth().currentUser?.getIdToken();
+      userInfo
+      ..clear()
+      ..addAll(await _userService.getInfo(token));
+    } catch (e) {
+      print(e.toString());
+      window.alert(e.toString());
+    } finally {
+      loading = false;
+    }
   }
 
+  /// get the ui configurations
   UIConfig getUIConfig() {
     if (_uiConfig == null) {
-      var googleOptions = new CustomSignInOptions(
+      final CustomSignInOptions googleOptions = CustomSignInOptions(
           provider: fb.GoogleAuthProvider.PROVIDER_ID,
-          scopes: ['email', 'https://www.googleapis.com/auth/plus.login'],
+          scopes: <String>['email', 'https://www.googleapis.com/auth/plus.login'],
           customParameters:
-              new GoogleCustomParameters(prompt: 'select_account'));
+              GoogleCustomParameters(prompt: 'select_account'));
 
 
-      var callbacks = new Callbacks(
-          uiShown: () => print("UI shown callback"),
+      final Callbacks callbacks = Callbacks(
+          uiShown: () => print('UI shown callback'),
           signInSuccessWithAuthResult: allowInterop(signInSuccess),
           signInFailure: signInFailure
       );
 
 
-      _uiConfig = new UIConfig(
+      _uiConfig = UIConfig(
           signInSuccessUrl: '/',
-          signInOptions: [
+          signInOptions: <dynamic>[
             googleOptions
           ],
-          signInFlow: "popup",
+          signInFlow: 'popup',
           credentialHelper: ACCOUNT_CHOOSER,
           tosUrl: '/tos.html',
           callbacks: callbacks);
@@ -96,10 +135,16 @@ class AppComponent {
     return _uiConfig;
   }
 
+  /// isAuthenticated
   bool isAuthenticated() => fb.auth().currentUser != null;
+  /// userEmail
   String get userEmail => fb.auth().currentUser?.email;
+  /// displayName
   String get displayName => fb.auth().currentUser?.displayName;
+  /// imageURL
   String get imageURL => fb.auth().currentUser?.photoURL;
+  /// userJson data
   Map<String, dynamic> get userJson => fb.auth().currentUser?.toJson();
-  List<Class> userInfo = List();
+  /// userInfo
+  final List<Class> userInfo = <Class>[];
 }

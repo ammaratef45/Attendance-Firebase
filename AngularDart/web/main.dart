@@ -7,16 +7,16 @@ import 'package:http/http.dart';
 import 'main.template.dart' as self;
 import 'secret.dart';
 
-@GenerateInjector([
-  ClassProvider(Client, useClass: BrowserClient),
+@GenerateInjector(<dynamic>[
+  ClassProvider<dynamic>(Client, useClass: BrowserClient),
 ])
-final InjectorFactory injector = self.injector$Injector;
+const InjectorFactory injector = self.injector$Injector;
 
 
 void main() {
   fb.initializeApp(
     apiKey: Secrets.apiKey,
-    authDomain: "attendance-c43bb.firebaseapp.com",
+    authDomain: 'attendance-c43bb.firebaseapp.com',
   );
   runApp(ng.AppComponentNgFactory, createInjector: injector);
 }

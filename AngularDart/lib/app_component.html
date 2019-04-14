@@ -7,6 +7,7 @@
         <p>{{displayName}}</p>
         <button (click)="logout()">Logout</button>
     </div>
+    <material-progress *ngIf="loading" [indeterminate]="true"></material-progress>
     <material-expansionpanel-set>
         <material-expansionpanel *ngFor="let aclass of userInfo"         
             name="{{aclass.name}}"
@@ -21,7 +22,7 @@
                         [showSaveCancel]="false"
                         name="{{session.date}}"
                         secondaryText="{{session.location}}">
-                        <button>Downlaod Sheet</button>
+                        <button (click)="downloadSessionSheet(aclass, session)">Downlaod Sheet</button>
                         <br/>
                         <button>Download QR</button>
                         <br/>
