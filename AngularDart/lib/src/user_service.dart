@@ -14,6 +14,8 @@ class UserService {
   static const String _baseUrl = 'https://attendance-app-api.herokuapp.com/';
   static const String _infoUrl = '${_baseUrl}getInfo';
   static const String _downloadUrl = '${_baseUrl}downloadsheet';
+  static const String _deleteUrl = '${_baseUrl}delete';
+  static const String _codeUrl = '${_baseUrl}code';
   final Client _http;
 
   /// return the info from getinfo endpoint
@@ -70,6 +72,54 @@ class UserService {
       }
       final Response response =
         await _http.post(_downloadUrl, headers:headers, body: body);
+      return response.body;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// call delete endpoint
+  Future<String> delete(
+    String token,
+    {
+      String classKey='0',
+      String sessionKey='0'
+    }
+  ) async {
+    try {
+      final Map<String, String> headers = <String, String>{
+        'x-token':token
+      };
+      final Map<String, dynamic> body = <String, dynamic>{};
+      if(classKey!='0') {
+        body['class'] = classKey;
+      }
+      if(sessionKey!='0') {
+        body['session'] = sessionKey;
+      }
+      final Response response =
+        await _http.post(_deleteUrl, headers:headers, body: body);
+      return response.body;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// call code endpoint
+  Future<String> qrCode(
+    String token,
+    String classKey,
+    String sessionKey
+  ) async {
+    try {
+      final Map<String, String> headers = <String, String>{
+        'x-token':token
+      };
+      final Map<String, dynamic> body = <String, dynamic>{};
+      body['class'] = classKey;
+      body['session'] = sessionKey;
+      final Response response =
+        await _http.post(_codeUrl, headers:headers, body: body);
       return response.body;
     } catch (e) {
       rethrow;

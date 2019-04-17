@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:html';
 import 'dart:js';
 import 'package:angular/angular.dart';
@@ -65,6 +66,82 @@ class AppComponent {
       window.alert(e.toString());
     } finally {
       loading = false;
+    }
+  }
+
+  /// download a sheet of a class
+  Future<void> downloadClassSheet(Class aclass) async {
+    loading = true;
+    try {
+      final String token = await fb.auth().currentUser?.getIdToken();
+      final String file = await _userService.getSessionSheet(
+        token,
+        classKey: aclass.key
+      );
+      final String encodedFileContents = Uri.encodeComponent(file);
+      AnchorElement(href: 'data:text/plain;charset=utf-8,$encodedFileContents')
+        ..setAttribute('download', 'file.csv')
+        ..click();
+      print(file);
+    } catch (e) {
+      print(e.toString());
+      window.alert(e.toString());
+    } finally {
+      loading = false;
+    }
+  }
+
+  /// download qr
+  Future<void> downloadQR(Class aclass, Session session) async {
+    final String token = await fb.auth().currentUser?.getIdToken();
+    final String response = await _userService.qrCode(
+      token,
+      aclass.key,
+      session.key
+    );
+    final String url = (json.decode(response))['data'][0];
+    AnchorElement(href: url)
+    ..setAttribute('download', 'qr.png')
+    ..click();
+    print(url);
+  }
+
+  /// delete a class from db
+  Future<void> deleteClass(Class aclass) async {
+    final String result = 
+      context.callMethod(
+      'prompt',
+      <dynamic>["Write 'I confirm' to confirm deletion"]
+    );
+    if(result.toLowerCase()=='I confirm'.toLowerCase()) {
+      final String token = await fb.auth().currentUser?.getIdToken();
+      final String response = await _userService.delete(
+        token,
+        classKey: aclass.key
+      );
+      // ignore: unawaited_futures
+      getUserInfo();
+      window.alert(response);
+    }
+  }
+
+  /// delete a session from db
+  Future<void> deleteSession(Class aclass, Session session) async {
+    final String result = 
+      context.callMethod(
+      'prompt',
+      <dynamic>["Write 'I confirm' to confirm deletion"]
+    );
+    if(result.toLowerCase()=='I confirm'.toLowerCase()) {
+      final String token = await fb.auth().currentUser?.getIdToken();
+      final String response = await _userService.delete(
+        token,
+        classKey: aclass.key,
+        sessionKey: session.key
+      );
+      // ignore: unawaited_futures
+      getUserInfo();
+      window.alert(response);
     }
   }
 

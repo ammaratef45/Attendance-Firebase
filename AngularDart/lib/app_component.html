@@ -13,8 +13,8 @@
             name="{{aclass.name}}"
             [showSaveCancel]="false"
             secondaryText="Have {{aclass.sessions.length}} sessions">
-            <button>Downlaod Sheet</button>
-            <button>Delete</button>
+            <button (click)="downloadClassSheet(aclass)">Downlaod Sheet</button>
+            <button (click)="deleteClass(aclass)">Delete</button>
             <br/>
             Sessions:
             <div>
@@ -24,9 +24,9 @@
                         secondaryText="{{session.location}}">
                         <button (click)="downloadSessionSheet(aclass, session)">Downlaod Sheet</button>
                         <br/>
-                        <button>Download QR</button>
+                        <button (click)="downloadQR(aclass, session)">Download QR</button>
                         <br/>
-                        <button>Delete</button>
+                        <button (click)="deleteSession(aclass, session)">Delete</button>
                     </material-expansionpanel>
             </div>
         </material-expansionpanel>
